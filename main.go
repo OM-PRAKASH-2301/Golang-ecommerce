@@ -29,10 +29,19 @@ func main() {
 
 	// Set up routes
 	r := mux.NewRouter()
-
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("admin/static/"))))
 	// Admin routes
 	r.HandleFunc("/admin/login", handlers.AdminLogin).Methods("POST")
-	r.HandleFunc("/admin/create", handlers.CreateAdmin).Methods("POST")
+	r.HandleFunc("/admin/create", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			// Serve the admin_create.html file
+			http.ServeFile(w, r, "admin/admin_create.html")
+		} else if r.Method == http.MethodPost {
+			handlers.CreateAdmin(w, r)
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	}).Methods("GET", "POST")
 	r.HandleFunc("/admins", handlers.GetAdmin).Methods("GET")
 	r.HandleFunc("/admin/product/add", handlers.AddProduct).Methods("POST")
 	r.HandleFunc("/admin/product/edit/{id}", handlers.EditProduct).Methods("PUT")

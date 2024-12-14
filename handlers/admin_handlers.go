@@ -4,7 +4,6 @@ import (
 	"context"
 	"ecommerce-project/models"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -19,7 +18,22 @@ type Admin struct {
 
 func CreateAdmin(w http.ResponseWriter, r *http.Request) {
 	var admin models.Admin
-	_ = json.NewDecoder(r.Body).Decode(&admin)
+	err := json.NewDecoder(r.Body).Decode(&admin)
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	// Validate username
+	if admin.Username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+	// Validate password
+	if admin.Password == "" {
+		http.Error(w, "Password is required", http.StatusBadRequest)
+		return
+	}
 
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(admin.Password), bcrypt.DefaultCost)
@@ -46,7 +60,6 @@ func AdminLogin(w http.ResponseWriter, r *http.Request) {
 
 	collection := db.Collection("admins")
 	var storedAdmin models.Admin
-	fmt.Println("hello")
 	// Find admin by username
 	err := collection.FindOne(context.TODO(), bson.M{"username": admin.Username}).Decode(&storedAdmin)
 	if err != nil {
@@ -84,24 +97,3 @@ func GetAdmin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(admins)
 }
-
-// func GetProducts(w http.ResponseWriter, r *http.Request) {
-// 	collection := db.Collection("products")
-
-// 	cursor, err := collection.Find(context.TODO(), bson.M{})
-// 	if err != nil {
-// 		http.Error(w, "Error fetching products", http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer cursor.Close(context.TODO())
-
-// 	var products []models.Product
-// 	if err = cursor.All(context.TODO(), &products); err != nil {
-// 		http.Error(w, "Error reading products", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	// Respond with products list
-// 	w.Header().Set("Content-Type", "application/json")
-// 	_ = json.NewEncoder(w).Encode(products)
-// }
