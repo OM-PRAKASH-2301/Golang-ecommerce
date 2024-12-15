@@ -24,14 +24,28 @@ func CreateAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Collect validation errors
+	errors := make(map[string]string)
+
 	// Validate username
 	if admin.Username == "" {
-		http.Error(w, "Username is required", http.StatusBadRequest)
-		return
+		errors["username"] = "Username is required"
+	} else if len(admin.Username) < 6 {
+		errors["username"] = "Username must be at least 6 characters long"
 	}
+
 	// Validate password
 	if admin.Password == "" {
-		http.Error(w, "Password is required", http.StatusBadRequest)
+		errors["password"] = "Password is required"
+	} else if len(admin.Password) < 4 {
+		errors["password"] = "Password must be at least 4 characters long"
+	}
+
+	// If there are validation errors, send them back
+	if len(errors) > 0 {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errors)
 		return
 	}
 
