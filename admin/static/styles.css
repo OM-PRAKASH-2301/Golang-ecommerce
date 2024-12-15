@@ -1,4 +1,4 @@
-<style>
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -45,4 +45,50 @@ h2 {
     color: green;
     margin-top: 20px;
 }
-</style>
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+.success-notify {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50; /* Green background */
+    color: yellow; /* Yellow text */
+    padding: 15px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    opacity: 0;
+    animation: fadeInOut 3s ease-in-out;
+    max-width: 300px;
+}
+
+.success-notify h4 {
+    margin: 0 0 10px 0; /* Spacing below header */
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.success-notify p {
+    margin: 0;
+    font-size: 14px;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    10%, 90% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+}
+
